@@ -12,7 +12,7 @@ namespace Babylon
     {
         // Use windowTypePtr == 2 for xaml swap chain panels
         pd.ndt = reinterpret_cast<void*>(2);
-        pd.nwh = config.WindowPtr;
+        pd.nwh = winrt::get_abi(config.SwapChainPanel);
         pd.context = nullptr;
         pd.backBuffer = nullptr;
         pd.backBufferDS = nullptr;

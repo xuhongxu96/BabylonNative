@@ -39,13 +39,6 @@ namespace Babylon
         DisableRendering();
     }
 
-    template<>
-    WindowType GraphicsImpl::GetNativeWindow<WindowType>()
-    {
-        std::scoped_lock lock{m_state.Mutex};
-        return static_cast<WindowType>(m_state.Bgfx.InitState.platformData.nwh);
-    }
-
     void GraphicsImpl::UpdateWindow(const WindowConfiguration& config)
     {
         std::scoped_lock lock{m_state.Mutex};

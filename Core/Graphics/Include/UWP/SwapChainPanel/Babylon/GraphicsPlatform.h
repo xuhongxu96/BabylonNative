@@ -5,14 +5,14 @@
 
 namespace Babylon
 {
-    using WindowType = winrt::Windows::UI::Xaml::Controls::ISwapChainPanel*;
+    using WindowType = winrt::Windows::UI::Xaml::Controls::ISwapChainPanel;
     using ContextType = ID3D11DeviceContext*;
 
     struct WindowConfiguration
     {
-        WindowType WindowPtr;
-        size_t Width;
-        size_t Height;
+        WindowType SwapChainPanel{};
+        size_t Width{};
+        size_t Height{};
     };
 
     struct ContextConfiguration

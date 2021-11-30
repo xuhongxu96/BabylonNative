@@ -394,4 +394,24 @@ namespace Babylon
         std::scoped_lock lock{m_state.Mutex};
         return m_state.Resolution.DevicePixelRatio;
     }
+
+    uint16_t GraphicsImpl::CreateNativeTexture(uintptr_t texturePtr)
+    {
+        // TODO: determine format/flags
+        bgfx::TextureHandle textureHandle = bgfx::createTexture2D(1, 1, false, 1, bgfx::TextureFormat::BGRA8, BGFX_TEXTURE_RT);
+
+        if (m_rendering)
+        {
+            throw std::runtime_error{"Cannot create native texture while rendering"};
+        }
+
+        bgfx::frame();
+
+        if (bgfx::overrideInternal(textureHandle, texturePtr) == 0)
+        {
+            assert(false);
+        }
+
+        return textureHandle.idx;
+    }
 }

@@ -106,6 +106,8 @@ namespace Babylon
 
         float GetDevicePixelRatio();
 
+        uint16_t CreateNativeTexture(uintptr_t texturePtr);
+
         using CaptureCallbackTicketT = arcana::ticketed_collection<std::function<void(const BgfxCallback::CaptureData&)>>::ticket;
         CaptureCallbackTicketT AddCaptureCallback(std::function<void(const BgfxCallback::CaptureData&)> callback);
 

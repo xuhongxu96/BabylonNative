@@ -44,7 +44,7 @@ namespace Babylon
         std::scoped_lock lock{m_state.Mutex};
         m_state.Bgfx.Dirty = true;
         ConfigureBgfxPlatformData(config, m_state.Bgfx.InitState.platformData);
-        UpdateDevicePixelRatio();
+        UpdateDevicePixelRatio(config);
     }
 
     void GraphicsImpl::UpdateContext(const ContextConfiguration& config)

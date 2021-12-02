@@ -23,9 +23,9 @@ namespace Babylon
         pd.backBufferDS = nullptr;
     }
 
-    float GraphicsImpl::UpdateDevicePixelRatio()
+    float GraphicsImpl::UpdateDevicePixelRatio(const WindowConfiguration& config)
     {
-        UINT dpi{GetDpiForWindow(GetNativeWindow<WindowType>())};
+        UINT dpi{GetDpiForWindow(config.WindowPtr)};
 
         // In windows, 100% DPI scaling is 96dpi.
         // See https://docs.microsoft.com/en-us/windows/win32/learnwin32/dpi-and-device-independent-pixels

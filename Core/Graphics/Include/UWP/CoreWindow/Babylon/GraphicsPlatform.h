@@ -8,7 +8,7 @@
 namespace Babylon
 {
     using WindowType = winrt::Windows::UI::Core::ICoreWindow*;
-    using ContextType = ID3D11DeviceContext*;
+    using ContextType = ID3D11Device*;
 
     struct WindowConfiguration
     {

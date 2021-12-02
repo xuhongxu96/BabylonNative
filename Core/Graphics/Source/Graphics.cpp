@@ -12,6 +12,11 @@ namespace Babylon
 
     Graphics::~Graphics() = default;
 
+    ContextType Graphics::GetContext() const
+    {
+        return static_cast<ContextType>(bgfx::getInternalData()->context);
+    }
+
     void Graphics::UpdateWindow(const WindowConfiguration& config)
     {
         m_impl->UpdateWindow(config);

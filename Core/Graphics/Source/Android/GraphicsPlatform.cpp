@@ -24,7 +24,7 @@ namespace Babylon
         pd.backBufferDS = nullptr;
     }
 
-    float GraphicsImpl::UpdateDevicePixelRatio()
+    float GraphicsImpl::UpdateDevicePixelRatio(const WindowConfiguration&)
     {
         // In Android, the baseline DPI is 160dpi.
         // See https://developer.android.com/training/multiscreen/screendensities#dips-pels

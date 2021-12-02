@@ -23,10 +23,10 @@ namespace Babylon
         pd.backBufferDS = nullptr;
     }
 
-    float GraphicsImpl::UpdateDevicePixelRatio()
+    float GraphicsImpl::UpdateDevicePixelRatio(const WindowConfiguration& config)
     {
         std::scoped_lock lock{m_state.Mutex};
-        MTKView* view = GetNativeWindow<WindowType>();
+        MTKView* view = config.WindowPtr;
         m_state.Resolution.DevicePixelRatio = view.contentScaleFactor;
         return m_state.Resolution.DevicePixelRatio;
     }

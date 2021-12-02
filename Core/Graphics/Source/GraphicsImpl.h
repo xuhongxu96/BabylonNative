@@ -118,9 +118,10 @@ namespace Babylon
 
         void ConfigureBgfxPlatformData(const WindowConfiguration& config, bgfx::PlatformData& platformData);
         void ConfigureBgfxPlatformData(const ContextConfiguration& config, bgfx::PlatformData& platformData);
+        float UpdateDevicePixelRatio(const WindowConfiguration& config);
+
         void UpdateBgfxState();
         void UpdateBgfxResolution();
-        float UpdateDevicePixelRatio();
         void DiscardIfDirty();
         void RequestScreenShots();
         void Frame();

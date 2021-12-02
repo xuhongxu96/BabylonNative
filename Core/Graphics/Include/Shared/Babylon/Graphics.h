@@ -21,6 +21,9 @@ namespace Babylon
         static std::unique_ptr<Graphics> CreateGraphics(const WindowConfiguration& config);
         static std::unique_ptr<Graphics> CreateGraphics(const ContextConfiguration& config);
 
+        // Returns the graphics context (GL context, D3D device, etc.).
+        ContextType GetContext() const;
+
         void UpdateWindow(const WindowConfiguration& config);
         void UpdateSize(size_t width, size_t height);
 

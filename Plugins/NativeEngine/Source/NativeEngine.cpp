@@ -1285,13 +1285,16 @@ namespace Babylon
         assert(bgfx::isTextureValid(0, false, 1, format, BGFX_TEXTURE_RT));
 
         std::array<bgfx::Attachment, 2> attachments{};
+        uint8_t numAttachments = 0;
 
         if (!bgfx::isValid(texture->Handle))
         {
             texture->Handle = bgfx::createTexture2D(width, height, generateMips, 1, format, BGFX_TEXTURE_RT);
         }
-        attachments[0].init(texture->Handle);
+
         texture->OwnsHandle = false;
+
+        attachments[numAttachments++].init(texture->Handle);
 
         if (generateDepth)
         {
@@ -1302,10 +1305,10 @@ namespace Babylon
             // And not sure it makes sense to generate mipmaps from a depth buffer with exponential values.
             // only allows mipmaps resolve step when mipmapping is asked and for the color texture, not the depth.
             // https://github.com/bkaradzic/bgfx/blob/2c21f68998595fa388e25cb6527e82254d0e9bff/src/renderer_d3d11.cpp#L4525
-            attachments[1].init(bgfx::createTexture2D(width, height, false, 1, depthStencilFormat, BGFX_TEXTURE_RT));
+            attachments[numAttachments++].init(bgfx::createTexture2D(width, height, false, 1, depthStencilFormat, BGFX_TEXTURE_RT));
         }
 
-        bgfx::FrameBufferHandle frameBufferHandle = bgfx::createFrameBuffer(static_cast<uint8_t>(attachments.size()), attachments.data(), true);
+        bgfx::FrameBufferHandle frameBufferHandle = bgfx::createFrameBuffer(numAttachments, attachments.data(), true);
 
         m_graphicsImpl.AddTexture(texture->Handle, width, height, generateMips, 1, format);
 

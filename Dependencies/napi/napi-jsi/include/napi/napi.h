@@ -50,8 +50,6 @@ struct napi_env__ {
     , native_name{facebook::jsi::PropNameID::forAscii(rt, "__native__")}
     , array_buffer_ctor{rt.global().getPropertyAsFunction(rt, "ArrayBuffer")}
     , promise_ctor{rt.global().getPropertyAsFunction(rt, "Promise")}
-    , get_prototype_of_func(rt.global().getPropertyAsObject(rt, "Object").getPropertyAsFunction(rt, "getPrototypeOf"))
-    , set_prototype_of_func(rt.global().getPropertyAsObject(rt, "Object").getPropertyAsFunction(rt, "setPrototypeOf"))
     , typed_array_ctor{
         rt.global().getPropertyAsFunction(rt, "Int8Array"),
         rt.global().getPropertyAsFunction(rt, "Uint8Array"),
@@ -65,12 +63,13 @@ struct napi_env__ {
   }
 
   facebook::jsi::Runtime& rt;
+
   facebook::jsi::PropNameID native_name;
   facebook::jsi::Function array_buffer_ctor;
   facebook::jsi::Function promise_ctor;
-  facebook::jsi::Function get_prototype_of_func;
-  facebook::jsi::Function set_prototype_of_func;
   facebook::jsi::Function typed_array_ctor[9];
+
+  facebook::jsi::Value last_exception;
 };
 
 using napi_env = napi_env__*;
@@ -78,6 +77,14 @@ using napi_env = napi_env__*;
 #ifdef NAPI_DISABLE_CPP_EXCEPTIONS
   #error Exceptions cannot be disabled for NAPI/JSI
 #endif
+
+#define NAPI_TRY() \
+  try {
+
+#define NAPI_CATCH() \
+  } catch (const std::exception& exception) { \
+    throw Error::New(_env, exception); \
+  }
 
 ////////////////////////////////////////////////////////////////////////////////
 /// N-API C++ Wrapper Classes
@@ -135,6 +142,9 @@ namespace Napi {
     Object Global() const;
     Value Undefined() const;
     Value Null() const;
+
+    bool IsExceptionPending() const;
+    Error GetAndClearPendingException();
 
   private:
     napi_env _env;
@@ -699,6 +709,8 @@ namespace Napi {
     size_t ByteLength() const; ///< Gets the length of the array buffer in bytes.
 
   private:
+    static jsi::ArrayBuffer FromExternal(napi_env env, void* externalData, size_t byteLength);
+
     std::optional<jsi::ArrayBuffer> _arrayBuffer;
   };
 

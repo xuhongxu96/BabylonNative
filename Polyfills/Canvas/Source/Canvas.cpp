@@ -57,9 +57,10 @@ namespace Babylon::Polyfills::Internal
         memcpy(fontBuffer.data(), (uint8_t*)buffer.Data(), buffer.ByteLength());
 
         auto& graphicsImpl{Babylon::GraphicsImpl::GetFromJavaScript(info.Env())};
+        auto update = graphicsImpl.GetUpdate("update");
         std::shared_ptr<JsRuntimeScheduler> runtimeScheduler{ std::make_shared<JsRuntimeScheduler>(JsRuntime::GetFromJavaScript(info.Env())) };
         auto deferred{Napi::Promise::Deferred::New(info.Env())};
-        arcana::make_task(graphicsImpl.BeforeRenderScheduler(), arcana::cancellation::none(), [fontName{ info[0].As<Napi::String>().Utf8Value() }, fontData{ std::move(fontBuffer) }]() {
+        arcana::make_task(update.Scheduler(), arcana::cancellation::none(), [fontName{ info[0].As<Napi::String>().Utf8Value() }, fontData{ std::move(fontBuffer) }]() {
             fontsInfos[fontName] = fontData;
         }).then(*runtimeScheduler, arcana::cancellation::none(), [runtimeScheduler /*Keep reference alive*/, env{ info.Env() }, deferred]() {
             deferred.Resolve(env.Undefined());
@@ -107,9 +108,18 @@ namespace Babylon::Polyfills::Internal
     {
         if (m_dirty)
         {
-            auto handle = bgfx::createFrameBuffer(static_cast<uint16_t>(m_width), static_cast<uint16_t>(m_height), bgfx::TextureFormat::RGBA8, BGFX_TEXTURE_RT);
+            std::array<bgfx::TextureHandle, 2> textures{
+                bgfx::createTexture2D(static_cast<uint16_t>(m_width), static_cast<uint16_t>(m_height), false, 1, bgfx::TextureFormat::RGBA8, BGFX_TEXTURE_RT),
+                bgfx::createTexture2D(static_cast<uint16_t>(m_width), static_cast<uint16_t>(m_height), false, 1, bgfx::TextureFormat::D24S8, BGFX_TEXTURE_RT)};
+
+            std::array<bgfx::Attachment, textures.size()> attachments{};
+            for (size_t idx = 0; idx < attachments.size(); ++idx)
+            {
+                attachments[idx].init(textures[idx]);
+            }
+            auto handle = bgfx::createFrameBuffer(static_cast<uint8_t>(attachments.size()), attachments.data(), true);
             assert(handle.idx != bgfx::kInvalidHandle);
-            m_frameBuffer = std::make_unique<FrameBuffer>(m_graphicsImpl, handle, static_cast<uint16_t>(m_width), static_cast<uint16_t>(m_height), false, false, false);
+            m_frameBuffer = std::make_unique<FrameBuffer>(m_graphicsImpl, handle, static_cast<uint16_t>(m_width), static_cast<uint16_t>(m_height), false, true, true);
             m_dirty = false;
 
             if (m_textureData)

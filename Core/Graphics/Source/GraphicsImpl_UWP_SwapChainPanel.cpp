@@ -10,29 +10,10 @@ namespace Babylon
     {
         // Use windowTypePtr == 2 for xaml swap chain panels
         pd.ndt = reinterpret_cast<void*>(2);
-<<<<<<< HEAD:Core/Graphics/Source/UWP/SwapChainPanel/GraphicsPlatform.cpp
-        pd.nwh = winrt::get_abi(config.SwapChainPanel);
-        pd.context = nullptr;
-        pd.backBuffer = nullptr;
-        pd.backBufferDS = nullptr;
-    }
-
-    void GraphicsImpl::ConfigureBgfxPlatformData(const ContextConfiguration& config, bgfx::PlatformData& pd)
-    {
-        pd.ndt = nullptr;
-        pd.nwh = nullptr;
-        pd.context = config.Context;
-        pd.backBuffer = nullptr;
-        pd.backBufferDS = nullptr;
-    }
-
-    float GraphicsImpl::UpdateDevicePixelRatio(const WindowConfiguration&)
-=======
         pd.nwh = winrt::get_abi(config.Window);
     }
 
     float GraphicsImpl::GetDevicePixelRatio(const WindowConfiguration&)
->>>>>>> origin/master:Core/Graphics/Source/GraphicsImpl_UWP_SwapChainPanel.cpp
     {
         // In UWP, DisplayInformation is only accessible from the UI thread. Calling this method from any other thread will cause a crash.
         // See https://docs.microsoft.com/en-us/uwp/api/windows.graphics.display.displayinformation.getforcurrentview?view=winrt-19041#Windows_Graphics_Display_DisplayInformation_GetForCurrentView

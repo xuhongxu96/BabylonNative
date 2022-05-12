@@ -3,7 +3,8 @@
 
 namespace
 {
-    template<typename sourceType> void PromoteToFloats(std::vector<uint8_t>& bytes, uint32_t numElements, uint32_t byteOffset, uint32_t byteStride)
+    template<typename sourceType>
+    std::optional<std::vector<uint8_t>> PromoteToFloats(gsl::span<uint8_t> bytes, uint32_t numElements, uint32_t byteOffset, uint32_t byteStride)
     {
         const size_t count = bytes.size() / byteStride;
         const size_t destinationSize = count * numElements * sizeof(float);
@@ -19,15 +20,17 @@ namespace
                     *destination++ = static_cast<float>(*source++);
                 }
             }
-            bytes.swap(newBytes);
+            return newBytes;
         }
+
+        return {};
     }
 }
 
 namespace Babylon
 {
     VertexBuffer::VertexBuffer(gsl::span<uint8_t> bytes, bool dynamic)
-        : m_bytes{{bytes.data(), bytes.data() + bytes.size()}}
+        : m_bytes{bytes}
         , m_dynamic{dynamic}
     {
     }
@@ -56,7 +59,7 @@ namespace Babylon
             }
         }
 
-        m_bytes.reset();
+        m_bytes = {};
         m_disposed = true;
     }
 
@@ -89,11 +92,11 @@ namespace Babylon
 
         auto releaseFn = [](void*, void* userData)
         {
-            auto* bytes = reinterpret_cast<decltype(m_bytes)*>(userData);
-            bytes->reset();
+            auto* floatBytes = reinterpret_cast<decltype(m_floatBytes)*>(userData);
+            floatBytes->reset();
         };
 
-        const bgfx::Memory* memory = bgfx::makeRef(m_bytes->data(), static_cast<uint32_t>(m_bytes->size()), releaseFn, &m_bytes);
+        const bgfx::Memory* memory = bgfx::makeRef(m_bytes.data(), static_cast<uint32_t>(m_bytes.size()), releaseFn, &m_floatBytes);
 
         if (m_dynamic)
         {
@@ -113,22 +116,22 @@ namespace Babylon
         {
             case bgfx::AttribType::Int8:
             {
-                ::PromoteToFloats<int8_t>(*m_bytes, numElements, byteOffset, byteStride);
+                m_floatBytes = ::PromoteToFloats<int8_t>(m_bytes, numElements, byteOffset, byteStride);
                 break;
             }
             case bgfx::AttribType::Uint8:
             {
-                ::PromoteToFloats<uint8_t>(*m_bytes, numElements, byteOffset, byteStride);
+                m_floatBytes = ::PromoteToFloats<uint8_t>(m_bytes, numElements, byteOffset, byteStride);
                 break;
             }
             case bgfx::AttribType::Int16:
             {
-                ::PromoteToFloats<int16_t>(*m_bytes, numElements, byteOffset, byteStride);
+                m_floatBytes = ::PromoteToFloats<int16_t>(m_bytes, numElements, byteOffset, byteStride);
                 break;
             }
             case bgfx::AttribType::Uint16:
             {
-                ::PromoteToFloats<uint16_t>(*m_bytes, numElements, byteOffset, byteStride);
+                m_floatBytes = ::PromoteToFloats<uint16_t>(m_bytes, numElements, byteOffset, byteStride);
                 break;
             }
             case bgfx::AttribType::Uint10: // is supported by any format ?
@@ -136,6 +139,11 @@ namespace Babylon
             {
                 throw std::runtime_error("Unable to promote vertex stream to a float array.");
             }
+        }
+
+        if (m_floatBytes)
+        {
+            m_bytes = gsl::make_span(m_floatBytes->data(), m_floatBytes->size());
         }
     }
 
@@ -161,7 +169,7 @@ namespace Babylon
         for (auto& pair : vertexBufferInstance)
         {
             const auto vertexBuffer{pair.second.Buffer};
-            instanceCount = static_cast<uint32_t>(vertexBuffer->m_bytes->size()) / pair.second.Stride;
+            instanceCount = static_cast<uint32_t>(vertexBuffer->m_bytes.size()) / pair.second.Stride;
             instanceStride += static_cast<uint16_t>(pair.second.ElementSize);
         }
 
@@ -180,7 +188,7 @@ namespace Babylon
 #endif
         {
             const auto& element{iter->second};
-            const auto* source{element.Buffer->m_bytes->data()};
+            const auto* source{element.Buffer->m_bytes.data()};
             for (uint32_t instance = 0; instance < instanceCount; instance++)
             {
                 std::memcpy(data + instance * instanceStride + offset, source + instance * element.Stride + element.Offset, element.ElementSize);

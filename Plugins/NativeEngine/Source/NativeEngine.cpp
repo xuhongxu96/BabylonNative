@@ -572,6 +572,7 @@ namespace Babylon
 
         const uint16_t flags = (is32Bits ? BGFX_BUFFER_INDEX32 : 0);
         IndexBuffer* indexBuffer = new IndexBuffer{gsl::make_span(static_cast<uint8_t*>(bytes.Data()) + byteOffset, byteLength), flags, dynamic};
+        indexBuffer->CreateHandle();
         return Napi::Pointer<IndexBuffer>::Create(info.Env(), indexBuffer, Napi::NapiPointerDeleter(indexBuffer));
     }
 

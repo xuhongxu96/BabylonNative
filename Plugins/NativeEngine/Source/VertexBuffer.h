@@ -30,7 +30,8 @@ namespace Babylon
         };
         static void BuildInstanceDataBuffer(bgfx::InstanceDataBuffer& instanceDataBuffer, const std::map<bgfx::Attrib::Enum, InstanceVertexBufferRecord>& vertexBufferInstance);
     private:
-        std::optional<std::vector<uint8_t>> m_bytes{};
+        gsl::span<uint8_t> m_bytes{};
+        std::optional<std::vector<uint8_t>> m_floatBytes{};
         bool m_dynamic{};
 
         union

@@ -586,7 +586,7 @@ namespace Babylon
         VertexArray* vertexArray = info[0].As<Napi::Pointer<VertexArray>>().Get();
         IndexBuffer* indexBuffer = info[1].As<Napi::Pointer<IndexBuffer>>().Get();
 
-        if (!vertexArray->RecordIndexBuffer(indexBuffer))
+        if (!vertexArray->RecordIndexBuffer(&m_runtime, indexBuffer))
         {
             JsConsoleLogger::LogWarn(info.Env(), "WARNING: Fail to create index buffer. Number of index buffers higher than max count.");
         }
@@ -631,7 +631,7 @@ namespace Babylon
         const bool normalized = info[7].As<Napi::Boolean>().Value();
         const uint32_t divisor = info[8].As<Napi::Number>().Uint32Value();
 
-        if (!vertexArray->RecordVertexBuffer(vertexBuffer, location, byteOffset, byteStride, numElements, type, normalized, divisor))
+        if (!vertexArray->RecordVertexBuffer(&m_runtime, vertexBuffer, location, byteOffset, byteStride, numElements, type, normalized, divisor))
         {
             JsConsoleLogger::LogWarn(info.Env(), "WARNING: Fail to create vertex buffer. Number of vertex buffers higher than max count or too many instanced streams.");
         }

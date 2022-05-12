@@ -27,9 +27,9 @@ namespace Babylon
         m_disposed = true;
     }
 
-    bool VertexArray::RecordIndexBuffer(IndexBuffer* indexBuffer)
+    bool VertexArray::RecordIndexBuffer(JsRuntime* runtime, IndexBuffer* indexBuffer)
     {
-        if (!indexBuffer->CreateHandle())
+        if (!indexBuffer->CreateHandle(runtime))
         {
             return false;
         }
@@ -40,7 +40,7 @@ namespace Babylon
         return true;
     }
 
-    bool VertexArray::RecordVertexBuffer(VertexBuffer* vertexBuffer, uint32_t location, uint32_t byteOffset, uint32_t byteStride, uint32_t numElements, uint32_t type, bool normalized, uint32_t divisor)
+    bool VertexArray::RecordVertexBuffer(JsRuntime* runtime, VertexBuffer* vertexBuffer, uint32_t location, uint32_t byteOffset, uint32_t byteStride, uint32_t numElements, uint32_t type, bool normalized, uint32_t divisor)
     {
         auto attrib{static_cast<bgfx::Attrib::Enum>(location)};
         if (divisor == 1)
@@ -97,7 +97,7 @@ namespace Babylon
 
             layout.end();
 
-            if (!vertexBuffer->CreateHandle(layout))
+            if (!vertexBuffer->CreateHandle(runtime, layout))
             {
                 return false;
             }

@@ -83,7 +83,7 @@ namespace Babylon
         }
     }
 
-    bool VertexBuffer::CreateHandle(const bgfx::VertexLayout& layout)
+    bool VertexBuffer::CreateHandle(JsRuntime* runtime, const bgfx::VertexLayout& layout)
     {
         if (bgfx::isValid(m_handle))
         {
@@ -91,7 +91,7 @@ namespace Babylon
             return true;
         }
 
-        m_data.m_runtime = &JsRuntime::GetFromJavaScript(m_data.m_ref.Env());
+        m_data.m_runtime = runtime;
         auto releaseFn = [](void*, void* userData)
         {
             auto* data = reinterpret_cast<decltype(m_data)*>(userData);

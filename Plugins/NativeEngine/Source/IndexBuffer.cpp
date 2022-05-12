@@ -56,14 +56,14 @@ namespace Babylon
         }
     }
 
-    bool IndexBuffer::CreateHandle()
+    bool IndexBuffer::CreateHandle(JsRuntime* runtime)
     {
         if (bgfx::isValid(m_handle))
         {
             return true;
         }
 
-        m_data.m_runtime = &JsRuntime::GetFromJavaScript(m_data.m_ref.Env());
+        m_data.m_runtime = runtime;
         auto releaseFn = [](void*, void* userData)
         {
             auto* data = reinterpret_cast<decltype(m_data)*>(userData);

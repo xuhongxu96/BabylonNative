@@ -13,8 +13,8 @@ namespace Babylon
 
         void Dispose();
 
-        bool RecordIndexBuffer(IndexBuffer* indexBuffer);
-        bool RecordVertexBuffer(VertexBuffer* vertexBuffer, uint32_t location, uint32_t byteOffset, uint32_t byteStride, uint32_t numElements, uint32_t type, bool normalized, uint32_t divisor);
+        bool RecordIndexBuffer(JsRuntime* runtime, IndexBuffer* indexBuffer);
+        bool RecordVertexBuffer(JsRuntime* runtime, VertexBuffer* vertexBuffer, uint32_t location, uint32_t byteOffset, uint32_t byteStride, uint32_t numElements, uint32_t type, bool normalized, uint32_t divisor);
         void SetIndexBuffer(bgfx::Encoder* encoder, uint32_t firstIndex, uint32_t numIndices);
         void SetVertexBuffers(bgfx::Encoder* encoder, uint32_t startVertex, uint32_t numVertices);
 

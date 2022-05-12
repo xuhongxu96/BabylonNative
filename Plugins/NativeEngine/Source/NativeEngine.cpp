@@ -571,8 +571,8 @@ namespace Babylon
         const bool dynamic = info[4].As<Napi::Boolean>().Value();
 
         const uint16_t flags = (is32Bits ? BGFX_BUFFER_INDEX32 : 0);
-        IndexBuffer* indexBuffer = new IndexBuffer{gsl::make_span(static_cast<uint8_t*>(bytes.Data()) + byteOffset, byteLength), flags, dynamic};
-        indexBuffer->CreateHandle();
+        IndexBuffer* indexBuffer = new IndexBuffer{Napi::Reference<Napi::ArrayBuffer>::New(bytes, 1), gsl::make_span(static_cast<uint8_t*>(bytes.Data()) + byteOffset, byteLength), flags, dynamic};
+        
         return Napi::Pointer<IndexBuffer>::Create(info.Env(), indexBuffer, Napi::NapiPointerDeleter(indexBuffer));
     }
 
@@ -610,7 +610,7 @@ namespace Babylon
         const uint32_t byteLength = info[2].As<Napi::Number>().Uint32Value();
         const bool dynamic = info[3].As<Napi::Boolean>().Value();
 
-        VertexBuffer* vertexBuffer = new VertexBuffer(gsl::make_span(static_cast<uint8_t*>(bytes.Data()) + byteOffset, byteLength), dynamic);
+        VertexBuffer* vertexBuffer = new VertexBuffer(Napi::Reference<Napi::ArrayBuffer>::New(bytes, 1), gsl::make_span(static_cast<uint8_t*>(bytes.Data()) + byteOffset, byteLength), dynamic);
         return Napi::Pointer<VertexBuffer>::Create(info.Env(), vertexBuffer, Napi::NapiPointerDeleter(vertexBuffer));
     }
 

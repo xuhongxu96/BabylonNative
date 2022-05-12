@@ -5,13 +5,14 @@
 #include <gsl/gsl>
 #include <map>
 #include <optional>
+#include <Babylon/JsRuntime.h>
 
 namespace Babylon
 {
     class VertexBuffer final
     {
     public:
-        VertexBuffer(gsl::span<uint8_t> bytes, bool dynamic);
+        VertexBuffer(Napi::Reference<Napi::ArrayBuffer>&& ref, gsl::span<uint8_t> bytes, bool dynamic);
         ~VertexBuffer();
 
         void Dispose();
@@ -29,7 +30,13 @@ namespace Babylon
             uint32_t ElementSize{};
         };
         static void BuildInstanceDataBuffer(bgfx::InstanceDataBuffer& instanceDataBuffer, const std::map<bgfx::Attrib::Enum, InstanceVertexBufferRecord>& vertexBufferInstance);
+
     private:
+        struct
+        {
+            JsRuntime* m_runtime;
+            Napi::Reference<Napi::ArrayBuffer> m_ref;
+        } m_data;
         gsl::span<uint8_t> m_bytes{};
         std::optional<std::vector<uint8_t>> m_floatBytes{};
         bool m_dynamic{};

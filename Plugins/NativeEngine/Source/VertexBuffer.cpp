@@ -29,8 +29,9 @@ namespace
 
 namespace Babylon
 {
-    VertexBuffer::VertexBuffer(gsl::span<uint8_t> bytes, bool dynamic)
-        : m_bytes{bytes}
+    VertexBuffer::VertexBuffer(Napi::Reference<Napi::ArrayBuffer>&& ref, gsl::span<uint8_t> bytes, bool dynamic)
+        : m_data{nullptr, std::move(ref)}
+        , m_bytes{bytes}
         , m_dynamic{dynamic}
     {
     }
@@ -90,13 +91,15 @@ namespace Babylon
             return true;
         }
 
+        m_data.m_runtime = &JsRuntime::GetFromJavaScript(m_data.m_ref.Env());
         auto releaseFn = [](void*, void* userData)
         {
-            auto* floatBytes = reinterpret_cast<decltype(m_floatBytes)*>(userData);
-            floatBytes->reset();
+            auto* data = reinterpret_cast<decltype(m_data)*>(userData);
+            data->m_runtime->Dispatch([ref = &data->m_ref](auto)
+                { ref->Unref(); });
         };
 
-        const bgfx::Memory* memory = bgfx::makeRef(m_bytes.data(), static_cast<uint32_t>(m_bytes.size()), releaseFn, &m_floatBytes);
+        const bgfx::Memory* memory = bgfx::makeRef(m_bytes.data(), static_cast<uint32_t>(m_bytes.size()), releaseFn, &m_data);
 
         if (m_dynamic)
         {

@@ -60,6 +60,7 @@ namespace Babylon
             }
         }
 
+        m_data.m_ref.Reset();
         m_bytes = {};
         m_disposed = true;
     }
